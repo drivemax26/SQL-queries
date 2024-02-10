@@ -1,0 +1,58 @@
+Write a query that returns data on active sessions in the database (MySQL)
+
+SELECT * FROM information_schema.processlist WHERE state != 'Killed';
+SHOW PROCESSLIST;
+
+Check the status of MySQL replication
+SHOW SLAVE STATUS;
+
+Get information on the maximum number of connections to the database
+SHOW VARIABLES LIKE 'max_connections';
+
+Select all user dialogs with ID = 12345
+SELECT * 
+FROM x27_social_dialogs 
+WHERE id_user_from = 12345 OR id_user_to = 12345;
+
+
+Select all dialogs of the user with ID = 12345 for the last week where there are new messages
+
+SELECT * 
+FROM x27_social_dialogs 
+WHERE (id_user_from = 12345 OR id_user_to = 12345) 
+AND has_new_msg = 1 
+AND date_created >= DATE_SUB(NOW(), INTERVAL 1 WEEK);
+
+
+Count the number of all user dialogs with ID = 12345
+
+SELECT COUNT(*) AS total_dialogs
+FROM x27_social_dialogs 
+WHERE id_user_from = 12345 OR id_user_to = 12345;
+
+
+Select 10 users with more than 10 dialogs
+
+SELECT user_id, COUNT(*) AS total_dialogs
+FROM (
+    SELECT id_user_to AS user_id FROM skelar.x27_social_dialogs
+    UNION ALL
+    SELECT id_user_from AS user_id FROM skelar.x27_social_dialogs
+) AS all_users
+GROUP BY user_id
+HAVING total_dialogs >= 10
+ORDER BY total_dialogs DESC
+LIMIT 10;
+
+
+Select the top 10 users by the number of divlogs
+
+SELECT user_id, COUNT(*) AS total_dialogs
+FROM (
+    SELECT id_user_to AS user_id FROM skelar.x27_social_dialogs
+    UNION ALL
+    SELECT id_user_from AS user_id FROM skelar.x27_social_dialogs
+) AS all_users
+GROUP BY user_id
+ORDER BY total_dialogs DESC
+LIMIT 10;
